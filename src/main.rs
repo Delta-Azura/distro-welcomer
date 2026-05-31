@@ -28,72 +28,35 @@ use iced::Task;
 
 #[derive(Debug, Clone)]
 pub enum Message {
-    Install,
-    Select(String),
-    Uninstall,
-    Upgrade,
-    Search(String),
-    UpgradeDone,
+    Click,
 }
 
-struct App {
-    packages: Vec<String>,
-    selected: Option<String>,
-    pkglistwhole: Vec<String>,
-    search: String,
-    status: String,
-    statusapp: String,
+struct Widgets {
+    website: String,
+    documentation: String,
+    community: String,
+    image: String,
 }
 
-impl Default for App {
+impl Default for Widgets {
     fn default() -> Self {
         
         Self {
-            packages: fs::read_dir("/var/lib/pkg/DB")
-                .unwrap()
-                .filter_map(|e| Some(e.ok()?.file_name().to_string_lossy().to_string()))
-                .collect(),
-            selected: None,
-            pkglistwhole,
-            search: String::new(),
-            status: String::new(),
-            statusapp: String::new(),
+            website: String::new(),
+            documentation: String::new(),
+            community: String::new(),
+            image: String::new(),
         }
     }
 }
 
-fn pkg_button(label: &str, active: bool) -> Button<'_, Message> {
-    button(
-        text(label).size(13)
-    )
-    .on_press(Message::Select(label.to_string()))
-    .width(Length::Fill)
-    .style(move |_theme, status| {
-        let bg = if active {
-            Color::from_rgb(0.11, 0.62, 0.46)
-        } else if matches!(status, button::Status::Hovered) {
-            Color::from_rgb(0.15, 0.15, 0.17)
-        } else {
-            Color::from_rgb(0.10, 0.10, 0.12)
-        };
-        button::Style {
-            background: Some(Background::Color(bg)),
-            text_color: if active {
-                Color::WHITE
-            } else {
-                Color::from_rgb(0.75, 0.75, 0.78)
-            },
-            border: Border {
-                radius: 6.0.into(),
-                ..Default::default()
-            },
-            ..Default::default()
-        }
-    })
-}
 
-impl App {
+impl Widgets {
     pub fn view(&self) -> Element<'_, Message> {
+        column![
+            text("WELCOME TO ......")
+        ]
+        .into()
         
     }
 
@@ -103,36 +66,8 @@ impl App {
 
     pub fn update(&mut self, message: Message) -> Task<Message> {
         match message {
-            Message::Search(query) => { self.search = query; Task::none() }
-            Message::Select(pkg) => { self.selected = Some(pkg); Task::none() }
-            Message::Install => {
-                if let Some(pkg) = &self.selected {
-                    Command::new("pkexec").args(["cards", "install", pkg]).status().ok();
-                }
-                self.statusapp = String::from("Installed");
-                Task::none()
-            }
-            Message::Uninstall => {
-                if let Some(pkg) = &self.selected {
-                    Command::new("pkexec").args(["cards", "remove", pkg]).status().ok();
-                }
-                self.statusapp = String::from("Not installed");
-                Task::none()
-            }
-            Message::Upgrade => {
-                Task::perform(
-                    async {
-                        tokio::process::Command::new("pkexec")
-                            .args(["cards", "upgrade", "--proceed"])
-                            .status()
-                            .await
-                            .ok();
-                    },
-                    |_| Message::UpgradeDone,
-                )
-            }
-            Message::UpgradeDone => {
-                self.status = String::from("Upgrade terminé");
+            Message::Click => {
+                println!("ok");
                 Task::none()
             }
         }
@@ -140,6 +75,11 @@ impl App {
 
 }
 
-fn main() -> iced::Result {
-    iced::run(App::update, App::view)
+fn theme(_app: &Widgets) -> Theme {
+    Theme::Dark
 }
+
+fn main() -> iced::Result {
+    iced::run(Widgets::update, Widgets::view)
+}
+
