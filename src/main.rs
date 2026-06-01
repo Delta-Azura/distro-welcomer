@@ -31,17 +31,29 @@ pub enum Message {
     Click,
 }
 
+//#[derive(Default)]
 struct Widgets {
     website: String,
     documentation: String,
     community: String,
     image: String,
+    systemname: String,
 }
 
 impl Default for Widgets {
     fn default() -> Self {
-        
         Self {
+            systemname: fs::read_to_string("/etc/os-release")
+                .unwrap()
+                .lines()
+                .find(|l| l.starts_with("PRETTY_NAME="))
+                .unwrap()
+                .to_string()
+                .split_once("\"")
+                .map(|(_, name)| name)
+                .unwrap()
+                .split_once("\"")
+                .map(|(name, _)| name).unwrap().to_string(),
             website: String::new(),
             documentation: String::new(),
             community: String::new(),
@@ -54,7 +66,7 @@ impl Default for Widgets {
 impl Widgets {
     pub fn view(&self) -> Element<'_, Message> {
         column![
-            text("WELCOME TO ......")
+            text(format!("Welcome to : {}", self.systemname.to_string()))
         ]
         .into()
         

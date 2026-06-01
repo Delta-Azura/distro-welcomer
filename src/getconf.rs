@@ -1,3 +1,5 @@
+use anyhow::{Result, Context};
+
 pub fn getconf(args: &str) -> Result<()> {
     let result = args.split_once("=").map(|(_, result)| result).context("Failed to get the full parameter, check the syntax")?.split_whitespace();
     return result;
@@ -13,3 +15,8 @@ pub fn getimagepath(args: &str) -> Result<()> {
     return result;
 }
 
+
+pub fn loadconf() -> Result<()> {
+    let conf = fs::read_to_string("/etc/distro-welcomer.conf")?
+    return conf;
+}
