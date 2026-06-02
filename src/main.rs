@@ -15,7 +15,9 @@
 //    with this program; if not, write to the Free Software Foundation, Inc.,
 //    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+mod getconf;
 
+use getconf::loadconf;
 
 use iced::widget::{button, column, container, row, scrollable, text, Button};
 use iced::{Background, Border, Color, Element, Length, Theme};
@@ -92,6 +94,8 @@ fn theme(_app: &Widgets) -> Theme {
 }
 
 fn main() -> iced::Result {
+    let (website, documentation, community, image) = loadconf().expect("Failed to load the configuration file");
+    println!("{} {} {} {}", website, documentation, community, image);
     iced::run(Widgets::update, Widgets::view)
 }
 
